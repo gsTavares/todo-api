@@ -1,5 +1,6 @@
 package com.api.todo.model.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -8,20 +9,24 @@ public class Response<T> {
 
     private HttpStatus status;
     private T body;
-    private List<String> messsages;
+    private List<String> messages;
     
+    {
+        this.messages = new ArrayList<>();
+    }
+
     public Response() {
     }
 
     public Response(HttpStatus status, List<String> messsages) {
         this.status = status;
-        this.messsages = messsages;
+        this.messages = messsages;
     }
 
     public Response(HttpStatus status, T body, List<String> messsages) {
         this.status = status;
         this.body = body;
-        this.messsages = messsages;
+        this.messages = messsages;
     }
 
     public HttpStatus getStatus() {
@@ -40,12 +45,12 @@ public class Response<T> {
         this.body = body;
     }
 
-    public List<String> getMesssages() {
-        return messsages;
+    public List<String> getMMessages() {
+        return messages;
     }
 
-    public void setMesssages(List<String> messsages) {
-        this.messsages = messsages;
+    public void setMessages(List<String> messages) {
+        this.messages = messages;
     }
     
 }
