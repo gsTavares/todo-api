@@ -10,10 +10,6 @@ public class Response<T> {
     private HttpStatus status;
     private T body;
     private List<String> messages;
-    
-    {
-        this.messages = new ArrayList<>();
-    }
 
     public Response() {
     }
