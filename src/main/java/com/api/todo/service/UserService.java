@@ -23,6 +23,14 @@ public class UserService {
         messages.add(toBeAdd);
     }
 
+    private <T> ResponseEntity<Response<T>> createResponse(List<String> messages, HttpStatus status) {
+        return new ResponseEntity<Response<T>>(new Response<T>(status, messages), status);
+    }
+
+    private <T> ResponseEntity<Response<T>> createResponse(List<String> messages, HttpStatus status, T body) {
+        return new ResponseEntity<Response<T>>(new Response<T>(status, body, messages), status);
+    }
+
     public ResponseEntity<Response<User>> create(User user) {
         ResponseEntity<Response<User>> response;
         List<String> returnMessages = new ArrayList<>();
@@ -32,22 +40,20 @@ public class UserService {
             if (user.getUsername() == null) {
                 HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
                 addReturnMessage(returnMessages, "username is required");
-                response = new ResponseEntity<Response<User>>(new Response<User>(status, returnMessages), status);
+                response = createResponse(returnMessages, status);
             } else if (userRepository.existsByUsername(user.getUsername())) {
                 HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
                 addReturnMessage(returnMessages, "username is already used");
-                response = new ResponseEntity<Response<User>>(new Response<User>(status, returnMessages), status);
+                response = createResponse(returnMessages, status);
             } else if (user.getPassword() == null) {
                 HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
                 addReturnMessage(returnMessages, "password is required");
-                response = new ResponseEntity<Response<User>>(new Response<User>(status, returnMessages), status);
+                response = createResponse(returnMessages, status);
             } else {
                 User result = userRepository.saveAndFlush(user);
                 HttpStatus status = result == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK;
                 addReturnMessage(returnMessages, result == null ? "error while saving user" : "user saved successful!");
-                response = result == null
-                        ? new ResponseEntity<Response<User>>(new Response<User>(status, returnMessages), status)
-                        : new ResponseEntity<Response<User>>(new Response<User>(status, returnMessages), status);
+                response = createResponse(returnMessages, status, result);
             }
 
             return response;
@@ -55,7 +61,7 @@ public class UserService {
         } catch (Exception e) {
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             addReturnMessage(returnMessages, e.getMessage());
-            return new ResponseEntity<Response<User>>(new Response<User>(status, returnMessages), status);
+            return createResponse(returnMessages, status);
         }
 
     }
@@ -67,15 +73,13 @@ public class UserService {
             if (user.getUsername() == null || user.getPassword() == null) {
                 HttpStatus status = HttpStatus.NOT_ACCEPTABLE;
                 addReturnMessage(returnMessages, "invalid username or password");
-                response = new ResponseEntity<Response<Boolean>>(
-                        new Response<Boolean>(status, Boolean.FALSE, returnMessages), status);
+                response = createResponse(returnMessages, status);
             } else {
                 Optional<User> find = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
                 HttpStatus status = find.isPresent() ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
                 addReturnMessage(returnMessages,
                         find.isPresent() ? "user logged successful!" : "invalid username or password");
-                response = new ResponseEntity<Response<Boolean>>(
-                        new Response<Boolean>(status, find.isPresent(), returnMessages), status);
+                response = createResponse(returnMessages, status, find.isPresent());
             }
 
             return response;
