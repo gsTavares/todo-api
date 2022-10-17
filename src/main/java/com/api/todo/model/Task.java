@@ -14,6 +14,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Entity
 @Table(name = "task")
@@ -24,6 +26,7 @@ public class Task implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @JsonProperty(access = Access.WRITE_ONLY)
     @JoinColumn(name = "id_user")
     @ManyToOne
     private User user;
@@ -31,17 +34,17 @@ public class Task implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH::mm:ss", timezone = "America/Sao_Paulo")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "America/Sao_Paulo")
     @Column(name = "creation_date")
     private Date creationDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH::mm:ss", timezone = "America/Sao_Paulo")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss", timezone = "America/Sao_Paulo")
     @Column(name = "time_to_complete")
     private Date timeToComplete;
 
     @Column(name = "completed")
     private Boolean completed;
-    
+
     public Task() {
     }
 
@@ -93,9 +96,18 @@ public class Task implements Serializable {
         this.timeToComplete = timeToComplete;
     }
 
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
+    }
+
     @PrePersist
     public void prePersist() {
         this.creationDate = new Date();
+        this.completed = Boolean.FALSE;
     }
 
     @Override
